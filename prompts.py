@@ -93,8 +93,14 @@ STRICT RULES:
 - Do not include explanations outside JSON.
 - Extract signals ONLY from the provided text.
 - If a signal is not present in this chunk, return null or an empty list for that field.
-- LIMIT LISTS: To prevent truncation, include a MAXIMUM of 10-15 most representative items for terminology, preferred wording, and forbidden wording.
-- AVOID REPETITION: Do not repeat the same phrase multiple times in lists.
+- LIMIT LISTS: 
+  * Maximum 10 terminology items.
+  * Maximum 10 preferred_wording items.
+  * Maximum 10 forbidden_wording items.
+  * Maximum 5 profile_suggestions.
+- AVOID REPETITION: Do not repeat duplicate phrases. If a phrase appears many times, include it only once.
+- COMPACTNESS: Keep each phrase short (under 12 words). Do not include long copied passages.
+- PRIORITIZATION: If the output might become long, prioritize only the most important items.
 - NO LOOPS: Ensure the output is concise and does not get stuck in repetitive loops.
 
 EXTRACT:
@@ -137,9 +143,12 @@ Your task is to MERGE these partial results into one FINAL, comprehensive JSON p
 STRICT RULES:
 - Return valid JSON only.
 - Follow the EXACT schema provided below.
-- Combine lists (terminology, suggestions, etc.) and remove duplicates.
+- Combine lists (terminology, suggestions, etc.) and REMOVE DUPLICATES.
+- LIMIT FINAL LISTS: To ensure a high-quality summary and full JSON, limit the final terminology, preferred_wording, and forbidden_wording to the 20 most significant items across the entire document.
+- Limit profile_suggestions to the top 10 most impactful ones.
 - Synthesize writing style and formatting patterns into a single cohesive description.
 - Generate a final "summary" that acts as a direct, text-based breakdown of the most critical JSON elements.
+- Keep the summary under 200 words.
 
 FINAL SCHEMA:
 {
