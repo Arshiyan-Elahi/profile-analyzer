@@ -43,11 +43,24 @@ if st.button("Analyze SOP"):
     if not sop_text.strip():
         st.warning("Please provide SOP text to analyze.")
     else:
-        with st.spinner("Analyzing with Hugging Face API..."):
-            try:
-                result = analyze_sop(sop_text)
-                st.success("Analysis Complete!")
-                st.subheader("Profile Suggestions JSON")
-                st.json(result)
-            except Exception as e:
-                st.error(f"Error during analysis: {e}")
+        status_container = st.status("Initializing analysis...", expanded=True)
+        
+        def update_progress(text, percentage):
+            status_container.update(label=text)
+            # We can also add a progress bar inside the status if we want
+        
+        try:
+            result = analyze_sop(sop_text, progress_callback=update_progress)
+            status_container.update(label="Analysis Complete!", state="complete", expanded=False)
+            st.success("Analysis Complete!")
+            
+            # Display readable summary if available
+            if "summary" in result and result["summary"]:
+                st.subheader("Executive Summary")
+                st.info(result["summary"])
+            
+            st.subheader("Detected Profile (Structured JSON)")
+            st.json(result)
+        except Exception as e:
+            status_container.update(label="Analysis Failed", state="error")
+            st.error(f"Error during analysis: {e}")
