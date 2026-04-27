@@ -6,14 +6,23 @@ from prompts import SYSTEM_PROMPT
 
 load_dotenv()
 
-HF_TOKEN = os.getenv("HF_TOKEN")
 MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"
 
 def analyze_sop(sop_text):
-    if not HF_TOKEN or HF_TOKEN == "your_token_here":
-        raise ValueError("Valid HF_TOKEN not found in .env file.")
+    hf_token = os.getenv("HF_TOKEN")
+    
+    # Fallback for Streamlit Cloud deployment
+    if not hf_token or hf_token == "your_token_here" or hf_token == "your_hugging_face_token_here":
+        try:
+            import streamlit as st
+            hf_token = st.secrets.get("HF_TOKEN")
+        except Exception:
+            pass
 
-    client = InferenceClient(token=HF_TOKEN)
+    if not hf_token or hf_token == "your_token_here" or hf_token == "your_hugging_face_token_here":
+        raise ValueError("Valid HF_TOKEN not found. Please set it in .env locally or in Streamlit Secrets if deployed.")
+
+    client = InferenceClient(token=hf_token)
     
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
