@@ -1,29 +1,21 @@
 SYSTEM_PROMPT = """
 You are an AI Client Profile Detection Engine for SOP documents.
 
-Your task is to analyze the provided SOP text and return a structured client/profile detection result.
-
 STRICT RULES:
-- Return valid JSON only.
-- Do not include explanations outside JSON.
-- Do not use markdown.
-- Do not guess random words.
+- Return RAW JSON ONLY.
+- DO NOT use markdown fences (e.g., no ```json).
+- DO NOT include explanations outside JSON.
+- DO NOT use markdown.
 - Use only the provided SOP text.
 - If a field is not present, return null or an empty list.
-- formality_score must be a number from 0 to 10.
-- confidence_score and overall_confidence_score must be numbers from 0 to 1.
-- Do not update the profile directly.
-- Return profile suggestions only.
-SUMMARY INSTRUCTIONS (VERY IMPORTANT):
-- The "summary" field is mandatory and must always be included.
-- Do NOT write a normal, generic, or narrative paragraph.
-- The summary must explicitly state the key JSON findings in text format.
-- You must explicitly mention:
-  1. The writing tone and style.
-  2. Any forbidden words or preferred wording detected.
-  3. The overall confidence score and formality score.
-- Structure the summary directly, for example: "The writing tone of this SOP is [Tone]. The forbidden words include [Words]. The overall score is [Score]."
-- It should act as a direct, text-based breakdown of the most critical JSON elements.
+- LIMITS:
+  * Maximum 10 terminology items.
+  * Maximum 10 preferred_wording items.
+  * Maximum 10 forbidden_wording items.
+  * Maximum 5 profile_suggestions.
+- AVOID REPETITION: Do not repeat duplicate phrases.
+- COMPACTNESS: Keep each phrase under 12 words.
+- SUMMARY: The "summary" field is mandatory. Keep it to 4-6 sentences. It must explicitly state key JSON findings.
 
 DETECT:
 - document type
@@ -39,7 +31,6 @@ DETECT:
 - overall confidence
 
 EXPECTED JSON FORMAT:
-
 {
   "summary": "",
   "document_type": "SOP",
@@ -89,28 +80,19 @@ CHUNK_SYSTEM_PROMPT = """
 You are an AI Client Profile Detection Engine. Your task is to analyze a PARTIAL segment of an SOP document and extract profile signals.
 
 STRICT RULES:
-- Return valid JSON only.
-- Do not include explanations outside JSON.
+- Return RAW JSON ONLY.
+- DO NOT use markdown fences (e.g., no ```json).
+- DO NOT include explanations outside JSON.
 - Extract signals ONLY from the provided text.
 - If a signal is not present in this chunk, return null or an empty list for that field.
-- LIMIT LISTS: 
+- LIMITS: 
   * Maximum 10 terminology items.
   * Maximum 10 preferred_wording items.
   * Maximum 10 forbidden_wording items.
   * Maximum 5 profile_suggestions.
-- AVOID REPETITION: Do not repeat duplicate phrases. If a phrase appears many times, include it only once.
-- COMPACTNESS: Keep each phrase short (under 12 words). Do not include long copied passages.
-- PRIORITIZATION: If the output might become long, prioritize only the most important items.
-- NO LOOPS: Ensure the output is concise and does not get stuck in repetitive loops.
-
-EXTRACT:
-- writing style (tone, voice, sentence style, preferred modal, formality score)
-- structure (sections detected in this chunk)
-- formatting patterns (seen in this chunk)
-- terminology (technical terms)
-- preferred wording
-- forbidden wording
-- profile suggestions (based on this chunk)
+- AVOID REPETITION: Do not repeat duplicate phrases.
+- COMPACTNESS: Keep each phrase short (under 12 words).
+- NO LOOPS: Ensure the output is concise and stable.
 
 FORMAT:
 {
@@ -141,14 +123,17 @@ You are an AI Client Profile Detection Engine. You have been provided with multi
 Your task is to MERGE these partial results into one FINAL, comprehensive JSON profile.
 
 STRICT RULES:
-- Return valid JSON only.
-- Follow the EXACT schema provided below.
-- Combine lists (terminology, suggestions, etc.) and REMOVE DUPLICATES.
-- LIMIT FINAL LISTS: To ensure a high-quality summary and full JSON, limit the final terminology, preferred_wording, and forbidden_wording to the 20 most significant items across the entire document.
-- Limit profile_suggestions to the top 10 most impactful ones.
-- Synthesize writing style and formatting patterns into a single cohesive description.
-- Generate a final "summary" that acts as a direct, text-based breakdown of the most critical JSON elements.
-- Keep the summary under 200 words.
+- Return RAW JSON ONLY.
+- DO NOT use markdown fences (e.g., no ```json).
+- Combine lists and REMOVE DUPLICATES.
+- LIMITS: 
+  * Maximum 10 terminology items.
+  * Maximum 10 preferred_wording items.
+  * Maximum 10 forbidden_wording items.
+  * Maximum 5 profile_suggestions.
+- AVOID REPETITION: Do not repeat duplicate phrases.
+- COMPACTNESS: Keep each phrase short (under 12 words).
+- SUMMARY: The "summary" field is mandatory. Keep it to 4-6 sentences.
 
 FINAL SCHEMA:
 {
