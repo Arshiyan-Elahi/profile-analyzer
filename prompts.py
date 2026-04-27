@@ -93,6 +93,9 @@ STRICT RULES:
 - Do not include explanations outside JSON.
 - Extract signals ONLY from the provided text.
 - If a signal is not present in this chunk, return null or an empty list for that field.
+- LIMIT LISTS: To prevent truncation, include a MAXIMUM of 10-15 most representative items for terminology, preferred wording, and forbidden wording.
+- AVOID REPETITION: Do not repeat the same phrase multiple times in lists.
+- NO LOOPS: Ensure the output is concise and does not get stuck in repetitive loops.
 
 EXTRACT:
 - writing style (tone, voice, sentence style, preferred modal, formality score)

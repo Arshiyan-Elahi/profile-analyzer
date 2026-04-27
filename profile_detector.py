@@ -65,13 +65,63 @@ def _get_hf_client():
 
     return InferenceClient(token=hf_token)
 
+def _repair_json(json_str):
+    """
+    Attempts to repair truncated JSON by closing open braces/brackets/strings.
+    """
+    json_str = json_str.strip()
+    
+    # Basic cleanup
+    if not json_str:
+        return "{}"
+        
+    stack = []
+    in_string = False
+    escape = False
+    
+    # Track the last valid character to handle trailing commas
+    last_val_idx = -1
+    
+    for i, char in enumerate(json_str):
+        if escape:
+            escape = False
+            continue
+        if char == '\\':
+            escape = True
+            continue
+        if char == '"':
+            in_string = not in_string
+            continue
+        if not in_string:
+            if char in '{[':
+                stack.append('}' if char == '{' else ']')
+            elif char in '}]':
+                if stack and stack[-1] == char:
+                    stack.pop()
+            if not char.isspace():
+                last_val_idx = i
+    
+    # If we are inside a string, close it
+    if in_string:
+        json_str += '"'
+        
+    # Handle trailing comma before closing
+    if last_val_idx != -1 and json_str[last_val_idx] == ',':
+        json_str = json_str[:last_val_idx] + json_str[last_val_idx+1:]
+
+    # Close all open braces/brackets in reverse order
+    while stack:
+        json_str += stack.pop()
+        
+    return json_str
+
 def _call_hf_api(client, messages, max_tokens=1000):
     try:
         response = client.chat_completion(
             model=MODEL_ID,
             messages=messages,
             max_tokens=max_tokens,
-            temperature=0.2
+            temperature=0.1 # Lower temperature for more stability
         )
         
         content = response.choices[0].message.content
@@ -88,8 +138,14 @@ def _call_hf_api(client, messages, max_tokens=1000):
                 content = json_match.group(1)
             else:
                 content = content.strip()
-                
-        return json.loads(content)
+        
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            # Attempt to repair truncated JSON
+            repaired_content = _repair_json(content)
+            return json.loads(repaired_content)
+            
     except json.JSONDecodeError as e:
         raise ValueError(f"Model returned invalid JSON. Error: {str(e)}\nContent: {content}")
     except Exception as e:
