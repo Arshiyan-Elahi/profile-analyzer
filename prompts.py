@@ -15,20 +15,15 @@ STRICT RULES:
 - Do not update the profile directly.
 - Return profile suggestions only.
 SUMMARY INSTRUCTIONS (VERY IMPORTANT):
-- Generate a clear, natural, human-readable summary in 4-6 sentences.
-- The summary must read like a professional explanation written for a human (not JSON description).
-- Explain what the SOP is about and its purpose.
-- Describe the domain and context (e.g., IT, Pharma, QA, etc.).
-- Mention how structured and well-organized the document is.
-- Comment on clarity, compliance level, and writing quality.
-- Highlight any strengths or minor gaps in the SOP (if applicable).
-- The summary must NOT repeat JSON field names.
-- The summary must NOT use bullet points.
-- The summary must NOT sound robotic or templated.
-- The summary must NOT just restate detected values like "tone is formal".
-- Write it like a short paragraph someone can read to quickly understand the SOP quality and purpose.
 - The "summary" field is mandatory and must always be included.
-- Write the summary as if explaining the SOP to a manager or stakeholder reviewing document quality.
+- Do NOT write a normal, generic, or narrative paragraph.
+- The summary must explicitly state the key JSON findings in text format.
+- You must explicitly mention:
+  1. The writing tone and style.
+  2. Any forbidden words or preferred wording detected.
+  3. The overall confidence score and formality score.
+- Structure the summary directly, for example: "The writing tone of this SOP is [Tone]. The forbidden words include [Words]. The overall score is [Score]."
+- It should act as a direct, text-based breakdown of the most critical JSON elements.
 
 DETECT:
 - document type
