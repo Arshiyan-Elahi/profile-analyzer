@@ -1,0 +1,29 @@
+STANDARD OPERATING PROCEDURE
+Title: Data Backup and Recovery
+SOP Number: IT-001
+Department: Information Technology
+Version: 1.2
+Effective Date: 2026-01-15
+
+1. PURPOSE
+The purpose of this document is to outline the standard procedures for performing data backups and recovery operations to ensure data integrity and business continuity.
+
+2. SCOPE
+This procedure applies to all IT personnel responsible for managing critical company servers and databases.
+
+3. RESPONSIBILITIES
+IT Administrators are required to ensure daily backups are completed and verified.
+
+4. PROCEDURE
+4.1 Daily Backups
+The system shall automatically run incremental backups every night at 02:00 AM.
+Personnel must use the designated backup tool.
+Do not store backups on the local drive.
+
+4.2 Weekly Full Backups
+Full backups must be executed every Sunday at 01:00 AM.
+
+5. REVISION HISTORY
+- v1.0: Initial release
+- v1.1: Updated backup times
+- v1.2: Added requirement to use designated tool
